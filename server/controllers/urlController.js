@@ -1,9 +1,18 @@
-const { nanoid } = require("nanoid");
-const Url = require("../models/Url");
-
 const createShortUrl = async (req, res) => {
   try {
     const { longUrl } = req.body;
+
+    if (!longUrl) {
+      return res.status(400).json({
+        message: "A longUrl is required",
+      });
+    }
+
+    if (!longUrl.startsWith("http://") && !longUrl.startsWith("https://")) {
+      return res.status(400).json({
+        message: "longUrl must start with http:// or https://",
+      });
+    }
 
     const shortCode = nanoid(7);
 
@@ -13,6 +22,7 @@ const createShortUrl = async (req, res) => {
     });
 
     const savedUrl = await newUrl.save();
+
     res.json(savedUrl);
   } catch (error) {
     res.status(500).json({
@@ -43,15 +53,10 @@ const redirectToLongUrl = async (req, res) => {
     });
   }
 };
-
-// In urlController.js, add a new function redirectToLongUrl that:
-
 // Takes shortCode from the URL params (req.params)
 // Finds the matching Url document in the database
 // If found: increments its clicks by 1, saves it, then redirects (res.redirect(...)) to the longUrl
 // If not found: returns a 404 with an error message
-
-// A couple of hints since this introduces a new pattern:
 
 // Looking up by a field (not by _id) uses Url.findOne({ shortCode })
 // To increment and save, you can do document.clicks += 1; then await document.save();
