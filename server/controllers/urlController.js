@@ -21,4 +21,41 @@ const createShortUrl = async (req, res) => {
   }
 };
 
-module.exports = { createShortUrl };
+const redirectToLongUrl = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    const url = await Url.findOne({ shortCode });
+
+    if (!url) {
+      return res.status(404).json({
+        message: "Url was not found",
+      });
+    }
+
+    url.clicks += 1;
+    await url.save();
+
+    res.redirect(url.longUrl);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// In urlController.js, add a new function redirectToLongUrl that:
+
+// Takes shortCode from the URL params (req.params)
+// Finds the matching Url document in the database
+// If found: increments its clicks by 1, saves it, then redirects (res.redirect(...)) to the longUrl
+// If not found: returns a 404 with an error message
+
+// A couple of hints since this introduces a new pattern:
+
+// Looking up by a field (not by _id) uses Url.findOne({ shortCode })
+// To increment and save, you can do document.clicks += 1; then await document.save();
+// res.redirect(url) sends the browser to a different URL
+
+// Give it a try — write the function, then we'll wire up the route (GET /api/urls/:shortCode) together once you've got a version down.
+module.exports = { createShortUrl, redirectToLongUrl };
