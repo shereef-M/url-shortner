@@ -1,3 +1,6 @@
+const { nanoid } = require("nanoid");
+const Url = require("../models/Url");
+
 const createShortUrl = async (req, res) => {
   try {
     const { longUrl } = req.body;
@@ -25,6 +28,7 @@ const createShortUrl = async (req, res) => {
 
     res.json(savedUrl);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       message: error.message,
     });
