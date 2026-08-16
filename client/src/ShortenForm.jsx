@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ShortenForm = () => {
   const [longUrl, setLongUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
@@ -9,11 +11,11 @@ const ShortenForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/urls/shorten", {
+      const response = await axios.post(`${API_URL}/api/urls/shorten`, {
         longUrl,
       });
       const { shortCode } = response.data;
-      setShortUrl(`${window.location.origin}/api/urls/${shortCode}`);
+      setShortUrl(`${API_URL}/api/urls/${shortCode}`);
     } catch (error) {
       console.error(error);
     }
